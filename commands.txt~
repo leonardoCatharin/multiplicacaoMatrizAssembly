@@ -1,4 +1,4 @@
-as trabalho1.s -o trabalho1.o
+as trabalho1.s -o trabalho.o
 
 ld trabalho1.o -l c -dynamic-linker /lib/ld-linux.so.2 -o trabalho1
 
