@@ -1,29 +1,31 @@
 .section .data
 
-mensagem_begin: .asciz "\nPrograma Iniciado: Multiplicação de Matrizes\n"
+mensagem_begin: .asciz "\nPrograma Iniciado: Multiplicação de duas matrizes\n"
 
-mensagem_valor_m: .asciz "Digite o valor de de M: \n"
-mensagem_valor_n: .asciz "Digite o valor de de N: \n"
-mensagem_valor_p: .asciz "Digite o valor de de P: \n"
-mensagem_matriz_a: .asciz "Matriz A: (%d x %d)\n"
+mensagem_valor_m: .asciz "\nDigite o valor de de M: "
+mensagem_valor_n: .asciz "\nDigite o valor de de N: "
+mensagem_valor_p: .asciz "\nDigite o valor de de P: "
+mensagem_matriz_a: .asciz "\nMatriz A: (%d x %d)\n"
 mensagem_matriz_b: .asciz "Matriz B: (%d x %d)\n"
-mensagem_teste: .asciz "Matriz preenchida\n " #teste
-mostra2: .asciz "%d\n" #teste
+
+mensagem_matriz_preenchida_a: .asciz "Matriz preenchida (A)\n "
+mensagem_matriz_preenchida_b: .asciz "Matriz preenchida (B)\n "
+mostra_elemento: .asciz "%d\n"
 
 mensagem_elemento_a: .asciz "\nElemento (A): " 
 mensagem_elemento_b: .asciz "\nElemento (B): "
 
-debug: .asciz "ecx: %d" #teste
-
-matriz_a: .space 24
-matriz_b: .space 48
-matriz_c: .space 16
+matriz_a: .space 900
+	tam_matriz_a: .int 0
+matriz_b: .space 900
+	tam_matriz_b: .int 0
+matriz_c: .space 900
 
 valor_m: .int 0
 valor_n: .int 0
 valor_p: .int 0
 
-num_aux: .int 0
+num_aux: .int 0 #usado para repassar o valor no preenchimento das matrizes
 
 formato1: .asciz "%d"
 
@@ -63,8 +65,8 @@ _start:
 	call printf
 
 calculaQtdeElementosA:
-	addl $16, %esp	
-	movl $0, %ebx # apenas para limpar antes
+	addl $16, %esp #volta o ponteiro da pilha para o início
+	movl $0, %ebx #limpeza dos registradores
 	movl $0, %eax
 	movl $0, %ecx
 	movl $0, %edi
@@ -72,12 +74,15 @@ calculaQtdeElementosA:
 	movl valor_m, %eax
 	movl valor_n, %ebx
 	mull %ebx
+	movl $tam_matriz_a, %edx
+	movl %eax, (%edx)
 	movl %eax,%ecx	
 	movl $0, %eax
-	addl $16,%esp # limpa a pilha
+	addl $16,%esp
 		
 	movl $matriz_a, %edi
 	movl $0, %ebx
+	movl $0, %edx
 
 escritaA:	
 	incl %ebx
@@ -111,12 +116,15 @@ calculaQtdeElementosB:
 	movl valor_n, %eax
 	movl valor_p, %ebx
 	mull %ebx
+	movl $tam_matriz_b, %edx
+	movl %eax, (%edx)
 	movl %eax,%ecx	
 	movl $0, %eax
 	addl $16,%esp
 		
 	movl $matriz_b, %edi
 	movl $0, %ebx
+	movl $0, %edx
 
 escritaB:	
 	incl %ebx
@@ -143,10 +151,10 @@ escritaB:
 mostravetA:
 	popl %edi
 	popl %ecx
-	pushl $mensagem_teste
+	pushl $mensagem_matriz_preenchida_a
 	call printf
 	addl $4, %esp
-	movl $6, %ecx #tamanho está na manual
+	movl tam_matriz_a, %ecx
 	movl $matriz_a, %edi
 
 mostranumA:
@@ -155,7 +163,7 @@ mostranumA:
 	pushl %edi
 	pushl %ecx
 	pushl %ebx
-	pushl $mostra2
+	pushl $mostra_elemento
 
 	call printf
 	addl $8, %esp
@@ -167,10 +175,10 @@ mostranumA:
 mostravetB:
 	popl %edi
 	popl %ecx
-	pushl $mensagem_teste
+	pushl $mensagem_matriz_preenchida_b
 	call printf
 	addl $4, %esp
-	movl $12, %ecx #tamanho está na manual
+	movl tam_matriz_b, %ecx
 	movl $matriz_b, %edi
 
 mostranumB:
@@ -179,7 +187,7 @@ mostranumB:
 	pushl %edi
 	pushl %ecx
 	pushl %ebx
-	pushl $mostra2
+	pushl $mostra_elemento
 
 	call printf
 	addl $8, %esp
@@ -187,7 +195,6 @@ mostranumB:
 	popl %ecx
 	popl %edi
 	loop mostranumB
-		
 fim:
 	pushl $0
 	call exit
