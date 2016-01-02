@@ -19,7 +19,9 @@ matriz_a: .space 900
 	tam_matriz_a: .int 0
 matriz_b: .space 900
 	tam_matriz_b: .int 0
+	salto_matriz_b: .int 0
 matriz_c: .space 900
+	acumulador: .int 0
 
 valor_m: .int 0
 valor_n: .int 0
@@ -195,6 +197,40 @@ mostranumB:
 	popl %ecx
 	popl %edi
 	loop mostranumB
+
+valor_loop:
+	movl valor_p, %eax
+	movl $4, %ebx
+	mull %ebx
+	movl $salto_matriz_b, %edx
+	movl %eax, (%edx)
+
+	movl $matriz_a, %edi
+	movl $matriz_b, %esi
+	movl $matriz_c,%ebp
+
+	movl valor_m, %ecx
+
+multiplicacao:
+	pushl %ecx
+
+	movl (%edi),%eax 
+	movl (%esi),%ebx	
+	mull %ebx
+	movl $acumulador, %ebx
+	addl %eax, (%ebx)
+
+	addl $4, %edi
+	addl salto_matriz_b, %esi
+	
+	popl %ecx
+	loop multiplicacao
+
+escritaC:
+	movl acumulador, %eax
+	movl %eax, (%ebp)
+	addl $4, %ebp
+	movl $0, %eax	
 fim:
 	pushl $0
 	call exit
