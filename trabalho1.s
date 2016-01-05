@@ -214,6 +214,8 @@ atribui_matrizes:
 	movl $matriz_c,%ebp
 
 	movl valor_p, %ecx
+	movl $0, %eax
+	pushl %eax #salva registrador para o contador de colunas (&)
 
 loop_coluna:
 	pushl %ecx 
@@ -246,11 +248,15 @@ escritaC:
 
 retorno_loop_coluna:
 	movl $matriz_a, %edi #retorna registrador para o inicio da matriz
-	movl $matriz_b, %esi
-
-	addl $4, %esi
+	movl $matriz_b, %esi	
 	
 	popl %ecx
+	
+	popl %eax #recupera valor para ir para a próxima coluna	(&)
+	addl $4, %eax
+	addl %eax, %esi
+	pushl %eax
+	
 	loop loop_coluna
 	
 fim:
