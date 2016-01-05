@@ -8,6 +8,7 @@ mensagem_valor_p: .asciz "\nDigite o valor de de P: "
 mensagem_matriz_a: .asciz "\nMatriz A: (%d x %d)\n"
 mensagem_matriz_b: .asciz "Matriz B: (%d x %d)\n"
 
+debug: .asciz "debug"
 mensagem_matriz_preenchida_a: .asciz "Matriz preenchida (A)\n "
 mensagem_matriz_preenchida_b: .asciz "Matriz preenchida (B)\n "
 mostra_elemento: .asciz "%d\n"
@@ -20,6 +21,8 @@ matriz_a: .space 900
 matriz_b: .space 900
 	tam_matriz_b: .int 0
 	salto_matriz_b: .int 0
+	salto_coluna: .int 0
+	const: .int 0
 matriz_c: .space 900
 	acumulador: .int 0
 
@@ -198,31 +201,33 @@ mostranumB:
 	popl %edi
 	loop mostranumB
 
-valor_loop:
+calcula_salto_matriz_b:
 	movl valor_p, %eax
 	movl $4, %ebx
 	mull %ebx
 	movl $salto_matriz_b, %edx
 	movl %eax, (%edx)
 
+atribui_matrizes:
 	movl $matriz_a, %edi
 	movl $matriz_b, %esi
 	movl $matriz_c,%ebp
 
-	movl valor_m, %ecx
+	movl valor_p, %ecx
+
+loop_coluna:
+	pushl %ecx 
+	movl valor_n, %ecx #loop elemento coluna
 
 multiplicacao:
 	pushl %ecx
-
 	movl (%edi),%eax 
-	movl (%esi),%ebx	
+	movl (%esi),%ebx		
 	mull %ebx
 	movl $acumulador, %ebx
 	addl %eax, (%ebx)
-
 	addl $4, %edi
-	addl salto_matriz_b, %esi
-	
+	addl salto_matriz_b, %esi	
 	popl %ecx
 	loop multiplicacao
 
@@ -230,11 +235,24 @@ escritaC:
 	pushl acumulador
 	pushl $mostra_elemento
 	call printf
+	addl $8, %esp
 
 	movl acumulador, %eax
-	movl %eax, (%ebp)
+	movl %eax, (%ebp) 
 	addl $4, %ebp
-	movl $0, %eax	
+	movl $acumulador, %ebx #zera acumulador
+	movl $0, (%ebx)
+	movl $0, %eax
+
+retorno_loop_coluna:
+	movl $matriz_a, %edi #retorna registrador para o inicio da matriz
+	movl $matriz_b, %esi
+
+	addl $4, %esi
+	
+	popl %ecx
+	loop loop_coluna
+	
 fim:
 	pushl $0
 	call exit
