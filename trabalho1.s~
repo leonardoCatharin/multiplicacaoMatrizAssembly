@@ -18,10 +18,10 @@ mensagem_elemento_b: .asciz "\nElemento (B): "
 
 matriz_a: .space 900
 	tam_matriz_a: .int 0
+	constante_salto: .int 0
 matriz_b: .space 900
 	tam_matriz_b: .int 0
 	salto_matriz_b: .int 0
-	salto_coluna: .int 0
 	const: .int 0
 matriz_c: .space 900
 	acumulador: .int 0
@@ -68,6 +68,13 @@ _start:
 	pushl valor_n
 	pushl $mensagem_matriz_b
 	call printf
+
+calcula_constante_salto:
+	movl valor_n, %eax
+	movl $4, %ebx
+	mull %ebx
+	movl $constante_salto, %ebx
+	addl %eax, (%ebx)
 
 calculaQtdeElementosA:
 	addl $16, %esp #volta o ponteiro da pilha para o início
@@ -212,13 +219,18 @@ atribui_matrizes:
 	movl $matriz_a, %edi
 	movl $matriz_b, %esi
 	movl $matriz_c,%ebp
+	
+	movl valor_m, %ecx #loop elemento linha
 
-	movl valor_p, %ecx
+loop_linha:
+	pushl %ecx
 	movl $0, %eax
 	pushl %eax #salva registrador para o contador de colunas (&)
 
+	movl valor_p, %ecx
+
 loop_coluna:
-	pushl %ecx 
+	pushl %ecx
 	movl valor_n, %ecx #loop elemento coluna
 
 multiplicacao:
@@ -247,7 +259,7 @@ escritaC:
 	movl $0, %eax
 
 retorno_loop_coluna:
-	movl $matriz_a, %edi #retorna registrador para o inicio da matriz
+	subl constante_salto, %edi #retorna registrador para o inicio da matriz
 	movl $matriz_b, %esi	
 	
 	popl %ecx
@@ -258,6 +270,15 @@ retorno_loop_coluna:
 	pushl %eax
 	
 	loop loop_coluna
+
+retorno_loop_linha:
+	movl $matriz_b, %esi
+
+	popl %eax
+	
+	popl %ecx 	
+	addl constante_salto, %edi
+	loop loop_linha
 	
 fim:
 	pushl $0
