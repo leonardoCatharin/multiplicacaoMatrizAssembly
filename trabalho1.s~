@@ -1,5 +1,7 @@
 .section .data
 
+#21-01-2016
+
 mensagem_begin: .asciz "\nPrograma Iniciado: Multiplicação de duas matrizes\n"
 
 mensagem_valor_m: .asciz "\nDigite o valor de de M: "
@@ -8,15 +10,16 @@ mensagem_valor_p: .asciz "\nDigite o valor de de P: "
 mensagem_matriz_a: .asciz "\nMatriz A: (%d x %d)\n"
 mensagem_matriz_b: .asciz "Matriz B: (%d x %d)\n"
 
-mensagem_matriz_preenchida_a: .asciz "Matriz preenchida (A)\n "
-mensagem_matriz_preenchida_b: .asciz "Matriz preenchida (B)\n "
-mensagem_matriz_preenchida_c: .asciz "Matriz preenchida (C)\n "
-mensagem_quebra: .asciz "\n"
-mostra_elemento: .asciz "%d\n"
-mostra_elemento2: .asciz "->%d\n"
+mensagem_matriz_preenchida_a: .asciz "\nMatriz preenchida (A)\n"
+mensagem_matriz_preenchida_b: .asciz "\nMatriz preenchida (B)\n"
+mensagem_matriz_preenchida_c: .asciz "\nMatriz preenchida (C)\n"
 
-mensagem_elemento_a: .asciz "\nElemento (A): " 
-mensagem_elemento_b: .asciz "\nElemento (B): "
+mostra_elemento: .asciz "%d\t"
+
+mensagem_elemento_a: .asciz "\nElemento [%d][%d] (A): " 
+mensagem_elemento_b: .asciz "\nElemento [%d][%d] (B): "
+
+quebra_linha: .asciz "\n"
 
 matriz_a: .space 900
 	tam_matriz_a: .int 0
@@ -118,15 +121,24 @@ calculaQtdeElementosA:
 	addl $16,%esp
 		
 	movl $matriz_a, %edi
-	movl $0, %ebx
-	movl $0, %edx
+	movl $1, %ebx
+	movl $1, %edx
+	
+	jmp escritaA
 
-escritaA:	
-	incl %ebx
+
+incrementa_indice_matriz_a:
+	incl %edx
+	movl $1, %ebx
+
+escritaA:
+	cmpl valor_n, %ebx
+	jg incrementa_indice_matriz_a
+
  	pushl %edi
-	pushl %ecx
+	pushl %ecx 		
 	pushl %ebx
-		
+	pushl %edx 	
 	pushl $mensagem_elemento_a
 	call printf
 	pushl $num_aux
@@ -134,7 +146,11 @@ escritaA:
 	call scanf		
 	addl $12,%esp
 
+	popl %edx
+	
 	popl %ebx
+	incl %ebx
+
 	popl %ecx
 	popl %edi	
 	
@@ -160,14 +176,23 @@ calculaQtdeElementosB:
 	addl $16,%esp
 		
 	movl $matriz_b, %edi
-	movl $0, %ebx
-	movl $0, %edx
+	movl $1, %ebx
+	movl $1, %edx
+	
+	jmp escritaB
+
+incrementa_indice_matriz_b:
+	incl %edx
+	movl $1, %ebx
 
 escritaB:	
-	incl %ebx
+	cmpl valor_p, %ebx
+	jg incrementa_indice_matriz_b
+
  	pushl %edi
-	pushl %ecx
+	pushl %ecx 		
 	pushl %ebx
+	pushl %edx
 		
 	pushl $mensagem_elemento_b
 	call printf
@@ -176,7 +201,11 @@ escritaB:
 	call scanf	
 	addl $12,%esp
 
+	popl %edx
+	
 	popl %ebx
+	incl %ebx
+
 	popl %ecx
 	popl %edi	
 	
@@ -194,13 +223,26 @@ mostravetA:
 	movl tam_matriz_a, %ecx
 	movl $matriz_a, %edi
 
+	movl $0, %edx
+	jmp mostranumA
+
+quebraLinhaA:
+	pushl %ecx
+	pushl $quebra_linha
+	call printf
+	addl $4, %esp
+	movl $0, %edx
+	popl %ecx
+
 mostranumA:
+	cmpl valor_n, %edx
+	je quebraLinhaA
 
 	movl (%edi), %ebx
 	addl $4, %edi
+	pushl %edx
 	pushl %edi
 	pushl %ecx
-
 	pushl %ebx
 	pushl $mostra_elemento
 	call printf
@@ -208,6 +250,9 @@ mostranumA:
  	
 	popl %ecx
 	popl %edi
+	
+	popl %edx
+	incl %edx
 	loop mostranumA
 
 mostravetB:
@@ -219,19 +264,35 @@ mostravetB:
 	movl tam_matriz_b, %ecx
 	movl $matriz_b, %edi
 
+	movl $0, %edx
+	jmp mostranumB
+
+quebraLinhaB:
+	pushl %ecx
+	pushl $quebra_linha
+	call printf
+	addl $4, %esp
+	movl $0, %edx
+	popl %ecx
+
 mostranumB:
+	cmpl valor_p, %edx
+	je quebraLinhaB
+	
 	movl (%edi), %ebx
 	addl $4, %edi
+	pushl %edx
 	pushl %edi
 	pushl %ecx
 	pushl %ebx
 	pushl $mostra_elemento
-
 	call printf
 	addl $8, %esp
 
 	popl %ecx
 	popl %edi
+	popl %edx
+	incl %edx
 	loop mostranumB
 
 atribui_matrizes:
@@ -317,11 +378,26 @@ mostravetC:
 	addl $4, %esp
 	movl tam_matriz_c, %ecx
 	movl $matriz_c, %ebp
-	movl valor_p, %edx
+	movl $0, %edx
+
+	jmp mostranumC
 	
+quebraLinhaC:
+	pushl %ecx
+	pushl $quebra_linha
+	call printf
+	addl $4, %esp
+	movl $0, %edx
+	popl %ecx
+
 mostranumC:
+	cmpl valor_p, %edx
+	je quebraLinhaC
+
 	movl (%ebp), %ebx
 	addl $4, %ebp
+	
+	pushl %edx
 	pushl %ebp
 	pushl %ecx
 
@@ -332,8 +408,15 @@ mostranumC:
 	
 	popl %ecx
 	popl %ebp
+	popl %edx
+	
+	incl %edx
+
 	loop mostranumC
 	
 fim:
+	pushl $quebra_linha
+	call printf
+	addl $4, %esp
 	pushl $0
 	call exit
