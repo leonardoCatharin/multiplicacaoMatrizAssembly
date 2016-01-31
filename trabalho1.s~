@@ -1,12 +1,12 @@
 .section .data
 
-#21-01-2016
+#31-01-2016
 
 mensagem_begin: .asciz "\nPrograma Iniciado: Multiplicação de duas matrizes\n"
 
-mensagem_valor_m: .asciz "\nDigite o valor de de M: "
-mensagem_valor_n: .asciz "\nDigite o valor de de N: "
-mensagem_valor_p: .asciz "\nDigite o valor de de P: "
+mensagem_valor_m: .asciz "\nDigite o valor de M: "
+mensagem_valor_n: .asciz "\nDigite o valor de N: "
+mensagem_valor_p: .asciz "\nDigite o valor de P: "
 mensagem_matriz_a: .asciz "\nMatriz A: (%d x %d)\n"
 mensagem_matriz_b: .asciz "Matriz B: (%d x %d)\n"
 
